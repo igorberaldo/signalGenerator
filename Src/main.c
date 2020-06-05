@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -72,22 +72,38 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t seno[]={
-1800, 2026, 2248, 2463, 2667, 2858, 3032, 3187, 3320, 3429, 3512, 3568, 3596, 3596, 3568, 3512, 
-3429, 3320, 3187, 3032, 2858, 2667, 2463, 2248, 2026, 1800, 1574, 1352, 1137, 933, 742, 568,
-413, 280, 171, 88, 32, 4, 4, 32, 88, 171, 280, 413, 568, 742, 933, 1137, 1352, 1574
-};
-
-uint16_t rampa[]={
-0, 72, 144, 216, 288, 360, 432, 504, 576, 648, 720, 792, 864, 936, 1008, 1080, 1152, 1224, 1296, 1368,
-1440, 1512, 1584, 1656, 1728, 1800, 1872, 1944, 2016, 2088, 2160, 2232, 2304, 2376, 2448, 2520, 
-2592, 2664, 2736, 2808, 2880, 2952, 3024, 3096, 3168, 3240, 3312, 3384, 3456, 3528
-};
+uint16_t sineOut[50];
+void sine(double amplitude, double frequency)
+{
+	double period = 1 / (frequency * 50);
+	uint16_t amp = (amplitude / 0.0008059);
+	for(int i = 0; i < sizeof(sineOut)/sizeof(sineOut[0]); i++)
+	{
+		sineOut[i] = amp * sin(2* 3.14 * frequency * period * i);
+	}	
+}
+uint16_t rampOut[50];
+void ramp(double amplitude, double frequency)
+{
+	double period = 1 / (frequency * 50);
+	uint16_t amp = (amplitude / 0.0008059);
+	for(int i = 0; i < sizeof(rampOut)/sizeof(rampOut[0]); i++)
+	{
+		rampOut[i] = amp * period * i;
+	}	
+}
+uint16_t squareWaveOut[50];
+void squareWave(double amplitude, double frequency)
+{
+	double period = 1 / (frequency * 50);
+	uint16_t amp = (amplitude / 0.0008059);
+	//FOURIER SERIES FOR SQUARE WAVE
+}
 
 #define SIZE(x)					(sizeof(x)/sizeof(x[0]))
 
-uint16_t *ptr_buf = seno;
-uint16_t size_buf = SIZE(seno);
+uint16_t *ptr_buf = sineOut;
+uint16_t size_buf = SIZE(sineOut);
 uint16_t idx_buf=0;
 
 void gera_sinal(uint16_t *sinal, uint16_t size)
@@ -150,6 +166,10 @@ int main(void)
   MX_TIM22_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+	HAL_TIM_Base_Start_IT(&htim22);
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+	sine(2, 60);
+	gera_sinal(sineOut, SIZE(sineOut));
 
   /* USER CODE END 2 */
 
@@ -158,7 +178,6 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

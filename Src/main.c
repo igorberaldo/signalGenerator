@@ -24,6 +24,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <math.h>
+#include <stdio.h>
+#include "i2c-lcd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -101,6 +103,7 @@ void squareWave(double amplitude, double frequency)
 }
 
 #define SIZE(x)					(sizeof(x)/sizeof(x[0]))
+#define SLAVE_ADDRESS_LCD 0x4E
 
 uint16_t *ptr_buf = sineOut;
 uint16_t size_buf = SIZE(sineOut);
@@ -118,9 +121,6 @@ void user_timer(void)
 	__HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_2, ptr_buf[idx_buf]);
 	if(++idx_buf >= size_buf) { idx_buf = 0; }
 }
-
-#include <stdio.h>
-#include <math.h>
 
 int fputc(int ch, FILE *f)
 {
@@ -170,7 +170,9 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 	sine(2, 60);
 	gera_sinal(sineOut, SIZE(sineOut));
-
+	lcd_init();
+	lcd_put_cur(1, 0);
+	lcd_send_data('H');
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -178,7 +180,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
+		
   }
   /* USER CODE END 3 */
 }
